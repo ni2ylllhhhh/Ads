@@ -1,0 +1,6 @@
+{
+  "name": "টাইমার ও স্টপওয়াচ (Stopwatch Timer)",
+  "description": "সাদা ব্যাকগ্রাউন্ডে ভেক্টর স্টপওয়াচ ও কাউন্টডাউন টাইমার — লাইভ ইন্টার‍্যাক্টিভ টাইমার এবং স্ট্যান্ডঅ্যালোন HTML কোড এক্সপোর্ট।",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

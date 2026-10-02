@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@keyframes sirenRed {
+  0%, 100% {
+    opacity: 0.9;
+    transform: scale(1.12);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(0.88);
+  }
+}
+
+@keyframes sirenBlue {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(0.88);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.12);
+  }
+}
+
+.animate-siren-red {
+  animation: sirenRed 1s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.animate-siren-blue {
+  animation: sirenBlue 1s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@keyframes deepPulseGreen {
+  0%, 100% {
+    opacity: 0.95;
+    transform: scale(1.18);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.86);
+  }
+}
+
+@keyframes deepPulseBlue {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.86);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes deepPulseWhite {
+  0%, 100% {
+    opacity: 0.9;
+    transform: scale(1.2);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(0.75);
+  }
+}
+
+.animate-glow-green {
+  animation: deepPulseGreen 1.2s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.animate-glow-blue {
+  animation: deepPulseBlue 1.2s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.animate-glow-white {
+  animation: deepPulseWhite 1.5s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
