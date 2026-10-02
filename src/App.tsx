@@ -5,8 +5,10 @@ import { AdBanner } from './components/AdBanner';
 import { generateStandaloneHtml } from './utils/htmlExport';
 
 export default function App() {
-  // 30-second auto countdown state (displays 'go go' when time ends)
-  const [displayNumber, setDisplayNumber] = useState<number | string>(30);
+  const TOTAL_SECONDS = 59;
+
+  // 59-second auto countdown state (displays 'go go' when time ends)
+  const [displayNumber, setDisplayNumber] = useState<number | string>(TOTAL_SECONDS);
   const [isRunning, setIsRunning] = useState<boolean>(true);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
@@ -16,34 +18,34 @@ export default function App() {
   const scrollDirectionRef = useRef<1 | -1>(1); // 1 = down, -1 = up
   const isPausingAtEndRef = useRef<boolean>(false);
 
-  // Toggle timer (no sound) - restarts from 30 if finished
+  // Toggle timer (no sound) - restarts from 59 if finished
   const handleToggle = useCallback(() => {
     if (isFinished) {
       setIsFinished(false);
-      setDisplayNumber(30);
+      setDisplayNumber(TOTAL_SECONDS);
       setIsRunning(true);
       return;
     }
     setIsRunning((prev) => !prev);
-  }, [isFinished]);
+  }, [isFinished, TOTAL_SECONDS]);
 
-  // Reset to original 30 (no sound)
+  // Reset to original 59 (no sound)
   const handleReset = useCallback(() => {
     setIsFinished(false);
     setIsRunning(true);
-    setDisplayNumber(30);
-  }, []);
+    setDisplayNumber(TOTAL_SECONDS);
+  }, [TOTAL_SECONDS]);
 
-  // On every page refresh / load, reset scroll to top and ensure timer starts fresh at 30
+  // On every page refresh / load, reset scroll to top and ensure timer starts fresh at 59
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
-    setDisplayNumber(30);
+    setDisplayNumber(TOTAL_SECONDS);
     setIsFinished(false);
     setIsRunning(true);
-  }, []);
+  }, [TOTAL_SECONDS]);
 
   // Pause timer & scrolling when user leaves tab/website, resume on return
   useEffect(() => {
@@ -104,10 +106,10 @@ export default function App() {
     };
   }, [isRunning, isFinished]);
 
-  // Dynamic progress arc for the 30-second scale (0 to 30/60 = 0.50)
-  const progressRatio = typeof displayNumber === 'number' ? displayNumber / 60 : 0;
+  // Dynamic progress arc for the 59-second scale (0 to 59/59 = 1.0)
+  const progressRatio = typeof displayNumber === 'number' ? displayNumber / TOTAL_SECONDS : 0;
 
-  // Auto-scroll loop: calibrated to complete scrolling across 30 seconds
+  // Auto-scroll loop: calibrated to complete scrolling across 59 seconds
   // Pauses when user is away from this website
   useEffect(() => {
     let lastTime = performance.now();
@@ -122,8 +124,8 @@ export default function App() {
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
 
         if (maxScroll > 10) {
-          // Speed: traverses total scroll distance in exactly 30 seconds (30,000 ms)
-          const speedPerMs = maxScroll / 30000;
+          // Speed: traverses total scroll distance in exactly 59 seconds (59,000 ms)
+          const speedPerMs = maxScroll / (TOTAL_SECONDS * 1000);
           const dy = speedPerMs * delta;
 
           if (scrollDirectionRef.current === 1) {
@@ -162,14 +164,14 @@ export default function App() {
     return () => {
       if (scrollRafRef.current) cancelAnimationFrame(scrollRafRef.current);
     };
-  }, [isRunning]);
+  }, [isRunning, TOTAL_SECONDS]);
 
   // Copy standalone HTML code
   const handleCopyCode = async () => {
     try {
       const html = generateStandaloneHtml({
-        initialSeconds: 30,
-        title: '৩০ সেকেন্ড কাউন্টডাউন টাইমার ও বিজ্ঞাপন',
+        initialSeconds: TOTAL_SECONDS,
+        title: '৫৯ সেকেন্ড কাউন্টডাউন টাইমার ও বিজ্ঞাপন',
         isInteractive: true,
       });
       await navigator.clipboard.writeText(html);

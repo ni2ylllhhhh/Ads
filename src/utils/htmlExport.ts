@@ -15,7 +15,7 @@ export function generatePureSvg(options: {
   progressPercent?: number; // 0 to 100
   showNotches?: boolean;
 } = {}): string {
-  const { value = '30', progressPercent = 50, showNotches = false } = options;
+  const { value = '59', progressPercent = 100, showNotches = false } = options;
 
   // ViewBox: 0 0 500 540
   const cx = 250;
@@ -160,12 +160,12 @@ export function generateStandaloneHtml(options: {
   isInteractive?: boolean;
 } = {}): string {
   const {
-    initialSeconds = 30,
-    title = '৩০ সেকেন্ড কাউন্টডাউন টাইমার ও বিজ্ঞাপন',
+    initialSeconds = 59,
+    title = '৫৯ সেকেন্ড কাউন্টডাউন টাইমার ও বিজ্ঞাপন',
     isInteractive = true,
   } = options;
 
-  const svgContent = generatePureSvg({ value: initialSeconds, progressPercent: (initialSeconds / 60) * 100, showNotches: false });
+  const svgContent = generatePureSvg({ value: initialSeconds, progressPercent: (initialSeconds / 59) * 100, showNotches: false });
 
   // Generate 20 alternating ad slots (even = key 1, odd = key 2)
   const adSlots = Array.from({ length: 20 }, (_, i) => {
@@ -362,7 +362,7 @@ export function generateStandaloneHtml(options: {
         }
       }
       if (arcEl) {
-        const ratio = isGo ? 0 : (val / 60);
+        const ratio = isGo ? 0 : (val / 59);
         const cx = 250, cy = 295, rOut = 168, rIn = 120;
         const angleDeg = Math.max(0.1, ratio * 360);
         const angleRad = (angleDeg * Math.PI) / 180;
@@ -458,8 +458,8 @@ export function generateStandaloneHtml(options: {
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
 
         if (maxScroll > 10) {
-          // Exactly 30 seconds (30000ms) to scroll full page
-          const speed = (maxScroll / 30000) * delta;
+          // Exactly 59 seconds (59000ms) to scroll full page
+          const speed = (maxScroll / 59000) * delta;
 
           if (scrollDirection === 1) {
             if (currentY >= maxScroll - 3) {

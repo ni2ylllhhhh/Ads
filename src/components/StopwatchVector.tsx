@@ -22,8 +22,8 @@ interface StopwatchVectorProps {
 }
 
 export const StopwatchVector: React.FC<StopwatchVectorProps> = ({
-  value = '30',
-  progress = 0.5,
+  value = '59',
+  progress = 1.0,
   isRunning = false,
   showNotches = false,
   onCrownClick,
