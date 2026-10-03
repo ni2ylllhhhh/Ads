@@ -7,9 +7,9 @@ import { playTickSound, playAlarmChime, playClickSound, initAudioOnInteraction }
 
 export default function App() {
   const TOTAL_SECONDS = 59;
-  // Scrolls the full page top-to-bottom in ~11 seconds
-  // Result: In 1 minute (60s), it scrolls top-to-bottom and back more than 2 full cycles (~2.6 round trips)
-  const ONE_WAY_SCROLL_MS = 11000;
+  // Scrolls the full page top-to-bottom in ~30 seconds (gentle, relaxed, slow smooth pace)
+  // Result: Slower and smooth scrolling across all 50+ ads, completing 1 full round trip per minute
+  const ONE_WAY_SCROLL_MS = 30000;
 
   // 59-second auto countdown state (displays 'go go' when time ends)
   const [displayNumber, setDisplayNumber] = useState<number | string>(TOTAL_SECONDS);
@@ -162,7 +162,7 @@ export default function App() {
                 scrollDirectionRef.current = -1;
                 isPausingAtEndRef.current = false;
                 lastTime = performance.now();
-              }, 350);
+              }, 500);
             } else {
               window.scrollBy({ top: dy, behavior: 'auto' });
             }
@@ -174,7 +174,7 @@ export default function App() {
                 scrollDirectionRef.current = 1;
                 isPausingAtEndRef.current = false;
                 lastTime = performance.now();
-              }, 350);
+              }, 500);
             } else {
               window.scrollBy({ top: -dy, behavior: 'auto' });
             }

@@ -576,8 +576,8 @@ export function generateStandaloneHtml(options: {
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
 
         if (maxScroll > 10) {
-          // Exactly ~11 seconds (11000ms) to scroll full page (more than 2 full round-trips in 60s)
-          const speed = (maxScroll / 11000) * delta;
+          // Exactly ~30 seconds (30000ms) to scroll full page (gentle, relaxed, slow smooth pace)
+          const speed = (maxScroll / 30000) * delta;
 
           if (scrollDirection === 1) {
             if (currentY >= maxScroll - 3) {
@@ -586,7 +586,7 @@ export function generateStandaloneHtml(options: {
                 scrollDirection = -1;
                 isPausing = false;
                 lastTime = performance.now();
-              }, 350);
+              }, 500);
             } else {
               window.scrollBy(0, speed);
             }
@@ -597,7 +597,7 @@ export function generateStandaloneHtml(options: {
                 scrollDirection = 1;
                 isPausing = false;
                 lastTime = performance.now();
-              }, 350);
+              }, 500);
             } else {
               window.scrollBy(0, -speed);
             }
