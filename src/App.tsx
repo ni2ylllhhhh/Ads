@@ -3,9 +3,13 @@ import { Copy, Check } from 'lucide-react';
 import { StopwatchVector } from './components/StopwatchVector';
 import { AdBanner } from './components/AdBanner';
 import { generateStandaloneHtml } from './utils/htmlExport';
+import { playTickSound, playAlarmChime, playClickSound, initAudioOnInteraction } from './utils/audio';
 
 export default function App() {
   const TOTAL_SECONDS = 59;
+  // Scrolls the full page top-to-bottom in ~11 seconds
+  // Result: In 1 minute (60s), it scrolls top-to-bottom and back more than 2 full cycles (~2.6 round trips)
+  const ONE_WAY_SCROLL_MS = 11000;
 
   // 59-second auto countdown state (displays 'go go' when time ends)
   const [displayNumber, setDisplayNumber] = useState<number | string>(TOTAL_SECONDS);
@@ -18,8 +22,10 @@ export default function App() {
   const scrollDirectionRef = useRef<1 | -1>(1); // 1 = down, -1 = up
   const isPausingAtEndRef = useRef<boolean>(false);
 
-  // Toggle timer (no sound) - restarts from 59 if finished
+  // Toggle timer - restarts from 59 if finished
   const handleToggle = useCallback(() => {
+    initAudioOnInteraction();
+    playClickSound();
     if (isFinished) {
       setIsFinished(false);
       setDisplayNumber(TOTAL_SECONDS);
@@ -29,8 +35,10 @@ export default function App() {
     setIsRunning((prev) => !prev);
   }, [isFinished, TOTAL_SECONDS]);
 
-  // Reset to original 59 (no sound)
+  // Reset to original 59
   const handleReset = useCallback(() => {
+    initAudioOnInteraction();
+    playClickSound(true);
     setIsFinished(false);
     setIsRunning(true);
     setDisplayNumber(TOTAL_SECONDS);
@@ -45,6 +53,19 @@ export default function App() {
     setDisplayNumber(TOTAL_SECONDS);
     setIsFinished(false);
     setIsRunning(true);
+
+    const unlock = () => {
+      initAudioOnInteraction();
+    };
+    window.addEventListener('click', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true });
+    window.addEventListener('keydown', unlock, { once: true });
+
+    return () => {
+      window.removeEventListener('click', unlock);
+      window.removeEventListener('touchstart', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
   }, [TOTAL_SECONDS]);
 
   // Pause timer & scrolling when user leaves tab/website, resume on return
@@ -80,7 +101,7 @@ export default function App() {
     };
   }, [isFinished]);
 
-  // 30-second countdown loop: when finished, stays on 'go go'
+  // 59-second countdown loop: plays mechanical clock tick sound each second and chime on finish
   useEffect(() => {
     if (!isRunning || isFinished) {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -93,8 +114,11 @@ export default function App() {
           if (prev <= 1) {
             setIsFinished(true);
             setIsRunning(false);
+            playAlarmChime();
             return 'go go'; // When time is finished, "go go" is written!
           }
+          // Mechanical clock ticking sound
+          playTickSound();
           return prev - 1;
         }
         return 'go go';
@@ -109,7 +133,7 @@ export default function App() {
   // Dynamic progress arc for the 59-second scale (0 to 59/59 = 1.0)
   const progressRatio = typeof displayNumber === 'number' ? displayNumber / TOTAL_SECONDS : 0;
 
-  // Auto-scroll loop: calibrated to complete scrolling across 59 seconds
+  // Auto-scroll loop: completes a one-way trip in ~11 seconds (more than 2 full round trips in 1 minute)
   // Pauses when user is away from this website
   useEffect(() => {
     let lastTime = performance.now();
@@ -124,8 +148,8 @@ export default function App() {
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
 
         if (maxScroll > 10) {
-          // Speed: traverses total scroll distance in exactly 59 seconds (59,000 ms)
-          const speedPerMs = maxScroll / (TOTAL_SECONDS * 1000);
+          // Speed: traverses total scroll distance in ~11 seconds (more than 2 round-trips in 60s)
+          const speedPerMs = maxScroll / ONE_WAY_SCROLL_MS;
           const dy = speedPerMs * delta;
 
           if (scrollDirectionRef.current === 1) {
@@ -136,7 +160,7 @@ export default function App() {
                 scrollDirectionRef.current = -1;
                 isPausingAtEndRef.current = false;
                 lastTime = performance.now();
-              }, 800);
+              }, 350);
             } else {
               window.scrollBy({ top: dy, behavior: 'auto' });
             }
@@ -148,7 +172,7 @@ export default function App() {
                 scrollDirectionRef.current = 1;
                 isPausingAtEndRef.current = false;
                 lastTime = performance.now();
-              }, 800);
+              }, 350);
             } else {
               window.scrollBy({ top: -dy, behavior: 'auto' });
             }
@@ -164,7 +188,7 @@ export default function App() {
     return () => {
       if (scrollRafRef.current) cancelAnimationFrame(scrollRafRef.current);
     };
-  }, [isRunning, TOTAL_SECONDS]);
+  }, [isRunning, ONE_WAY_SCROLL_MS]);
 
   // Copy standalone HTML code
   const handleCopyCode = async () => {

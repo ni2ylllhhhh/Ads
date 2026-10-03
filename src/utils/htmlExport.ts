@@ -55,6 +55,8 @@ export function generatePureSvg(options: {
     Z`;
 
   const isGoGo = typeof value === 'string' && value.toLowerCase().includes('go');
+  const currentSec = typeof value === 'number' ? value : (parseInt(String(value), 10) || 0);
+  const needleAngle = isGoGo ? 360 : Math.max(0, Math.min(360, ((59 - currentSec) / 59) * 360));
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 540" width="100%" height="100%" fill="none" style="display: block; max-width: 480px; margin: 0 auto; user-select: none;">
   <defs>
@@ -67,6 +69,27 @@ export function generatePureSvg(options: {
       <stop offset="0%" stop-color="#FF7A00" />
       <stop offset="100%" stop-color="#B91C1C" />
     </linearGradient>
+    <linearGradient id="needleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF5500" />
+      <stop offset="100%" stop-color="#DC2626" />
+    </linearGradient>
+    <!-- Unique Multi-Color Chromatic Neon Gradient for Numbers -->
+    <linearGradient id="uniqueNeonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF000" />
+      <stop offset="22%" stop-color="#FF007A" />
+      <stop offset="48%" stop-color="#7928CA" />
+      <stop offset="76%" stop-color="#00E5FF" />
+      <stop offset="100%" stop-color="#00FF87" />
+    </linearGradient>
+    <linearGradient id="goGoAuroraGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00FF87" />
+      <stop offset="50%" stop-color="#00E5FF" />
+      <stop offset="100%" stop-color="#FFE600" />
+    </linearGradient>
+    <filter id="digitNeonGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#FF007A" flood-opacity="0.5" />
+      <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#00E5FF" flood-opacity="0.4" />
+    </filter>
     <linearGradient id="numRedBlue" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#EF4444" />
       <stop offset="42%" stop-color="#DC2626" />
@@ -147,8 +170,19 @@ export function generatePureSvg(options: {
     <circle cx="250" cy="342" r="4.5" fill="#020617" />
   </g>
 
-  <!-- Center Value "30" or "GO GO" in Red-Blue Gradient -->
-  <text id="timer-display" x="250" y="${isGoGo ? 320 : 334}" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="${isGoGo ? 72 : 124}" font-weight="900" fill="url(#numRedBlue)" letter-spacing="${isGoGo ? 1 : -3}" style="text-transform: uppercase;">
+  <!-- Mechanical Clock Hand Needle (ঘড়ির কাঁটা) -->
+  <g id="needle-group" transform="rotate(${needleAngle} 250 295)" style="transition: transform 0.15s ease-out; pointer-events: none;">
+    <line x1="250" y1="319" x2="250" y2="153" stroke="rgba(0,0,0,0.3)" stroke-width="4.5" stroke-linecap="round" transform="translate(2, 3)" />
+    <line x1="250" y1="295" x2="250" y2="319" stroke="#EA580C" stroke-width="4" stroke-linecap="round" />
+    <circle cx="250" cy="319" r="5" fill="#DC2626" />
+    <path d="M 247.2 295 L 248.8 157 L 250 147 L 251.2 157 L 252.8 295 Z" fill="url(#needleGrad)" />
+    <circle cx="250" cy="149" r="4" fill="#FFF000" />
+    <circle cx="250" cy="295" r="8.5" fill="#0F172A" stroke="#FF6B00" stroke-width="2.5" />
+    <circle cx="250" cy="295" r="3" fill="#FFFFFF" />
+  </g>
+
+  <!-- Center Value in Unique Chromatic Neon Gradient with Glow & Outline -->
+  <text id="timer-display" x="250" y="${isGoGo ? 320 : 334}" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="${isGoGo ? 72 : 124}" font-weight="900" fill="${isGoGo ? 'url(#goGoAuroraGrad)' : 'url(#uniqueNeonGrad)'}" filter="url(#digitNeonGlow)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" letter-spacing="${isGoGo ? 1 : -3}" style="text-transform: uppercase;">
     ${value}
   </text>
 </svg>`;
@@ -344,13 +378,71 @@ export function generateStandaloneHtml(options: {
 
     const displayEl = document.getElementById('timer-display');
     const arcEl = document.getElementById('progress-arc');
+    const needleEl = document.getElementById('needle-group');
     const container = document.getElementById('timer-container');
+
+    // Web Audio Synthesizer for Clock Ticking (ঘড়ির কাটার শব্দ)
+    let audioCtx = null;
+    function getAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+      return audioCtx;
+    }
+
+    let tickToggle = false;
+    function playClockTick() {
+      try {
+        const ctx = getAudio();
+        if (!ctx) return;
+        tickToggle = !tickToggle;
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(tickToggle ? 1800 : 1420, now);
+        osc.frequency.exponentialRampToValueAtTime(160, now + 0.024);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.0005, now + 0.022);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.025);
+      } catch (e) {}
+    }
+
+    function playChime() {
+      try {
+        const ctx = getAudio();
+        if (!ctx) return;
+        const notes = [587.33, 739.99, 880.0];
+        const now = ctx.currentTime;
+        notes.forEach((freq, idx) => {
+          const st = now + idx * 0.14;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, st);
+          gain.gain.setValueAtTime(0.2, st);
+          gain.gain.exponentialRampToValueAtTime(0.001, st + 0.45);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(st);
+          osc.stop(st + 0.5);
+        });
+      } catch (e) {}
+    }
 
     // Auto Countdown Loop (Shows 'go go' when time finishes)
     function updateDisplay(val) {
       const isGo = typeof val === 'string' && val.toLowerCase().includes('go');
       if (displayEl) {
         displayEl.textContent = val;
+        displayEl.setAttribute('fill', isGo ? 'url(#goGoAuroraGrad)' : 'url(#uniqueNeonGrad)');
         if (isGo) {
           displayEl.setAttribute('font-size', '72');
           displayEl.setAttribute('y', '320');
@@ -361,6 +453,11 @@ export function generateStandaloneHtml(options: {
           displayEl.setAttribute('letter-spacing', '-3');
         }
       }
+      if (needleEl) {
+        const sec = typeof val === 'number' ? val : (parseInt(val, 10) || 0);
+        const nAngle = isGo ? 360 : Math.max(0, Math.min(360, ((59 - sec) / 59) * 360));
+        needleEl.setAttribute('transform', 'rotate(' + nAngle + ' 250 295)');
+      }
       if (arcEl) {
         const ratio = isGo ? 0 : (val / 59);
         const cx = 250, cy = 295, rOut = 168, rIn = 120;
@@ -370,11 +467,11 @@ export function generateStandaloneHtml(options: {
         const endY_out = cy - Math.cos(angleRad) * rOut;
         const endX_in = cx + Math.sin(angleRad) * rIn;
         const endY_in = cy - Math.cos(angleRad) * rIn;
-        const path = \`M \${cx} \${cy - rOut}
-          A \${rOut} \${rOut} 0 0 1 \${endX_out.toFixed(1)} \${endY_out.toFixed(1)}
-          L \${endX_in.toFixed(1)} \${endY_in.toFixed(1)}
-          A \${rIn} \${rIn} 0 0 0 \${cx} \${cy - rIn}
-          Z\`;
+        const path = 'M ' + cx + ' ' + (cy - rOut) +
+          ' A ' + rOut + ' ' + rOut + ' 0 0 1 ' + endX_out.toFixed(1) + ' ' + endY_out.toFixed(1) +
+          ' L ' + endX_in.toFixed(1) + ' ' + endY_in.toFixed(1) +
+          ' A ' + rIn + ' ' + rIn + ' 0 0 0 ' + cx + ' ' + (cy - rIn) +
+          ' Z';
         arcEl.setAttribute('d', path);
       }
     }
@@ -384,11 +481,13 @@ export function generateStandaloneHtml(options: {
       timerId = setInterval(() => {
         if (remaining > 1) {
           remaining--;
+          playClockTick();
           updateDisplay(remaining);
         } else {
           remaining = 0;
           isRunning = false;
           stopTimer();
+          playChime();
           updateDisplay('go go');
         }
       }, 1000);
@@ -402,6 +501,7 @@ export function generateStandaloneHtml(options: {
     // Restart timer when clicking clock if finished
     if (container) {
       container.addEventListener('click', () => {
+        getAudio();
         if (remaining === 0) {
           remaining = ${initialSeconds};
           isRunning = true;
@@ -410,6 +510,11 @@ export function generateStandaloneHtml(options: {
         }
       });
     }
+
+    // Unlock audio on first user touch/click
+    const unlock = () => { getAudio(); };
+    window.addEventListener('click', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true });
 
     // Clean reset on refresh/load
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -443,7 +548,7 @@ export function generateStandaloneHtml(options: {
       }
     });
 
-    // Continuous Auto Scroll across 30 Seconds (Pauses when away)
+    // Continuous Auto Scroll (Traverses in ~11s, completes > 2 full round trips per minute)
     let scrollDirection = 1;
     let isPausing = false;
     let lastTime = performance.now();
@@ -458,8 +563,8 @@ export function generateStandaloneHtml(options: {
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
 
         if (maxScroll > 10) {
-          // Exactly 59 seconds (59000ms) to scroll full page
-          const speed = (maxScroll / 59000) * delta;
+          // Exactly ~11 seconds (11000ms) to scroll full page (more than 2 full round-trips in 60s)
+          const speed = (maxScroll / 11000) * delta;
 
           if (scrollDirection === 1) {
             if (currentY >= maxScroll - 3) {
@@ -468,7 +573,7 @@ export function generateStandaloneHtml(options: {
                 scrollDirection = -1;
                 isPausing = false;
                 lastTime = performance.now();
-              }, 800);
+              }, 350);
             } else {
               window.scrollBy(0, speed);
             }
@@ -479,7 +584,7 @@ export function generateStandaloneHtml(options: {
                 scrollDirection = 1;
                 isPausing = false;
                 lastTime = performance.now();
-              }, 800);
+              }, 350);
             } else {
               window.scrollBy(0, -speed);
             }

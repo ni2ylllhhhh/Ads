@@ -53,32 +53,82 @@ export function playClickSound(highPitch = false): void {
   }
 }
 
+let tickToggle = false;
+
 /**
- * Soft tick sound for seconds ticking.
+ * Ensures AudioContext is initialized and resumed upon user interaction.
+ */
+export function initAudioOnInteraction(): void {
+  try {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+  } catch {
+    // Ignore
+  }
+}
+
+/**
+ * Realistic crisp mechanical clock tick sound (alternating tick / tock escapement).
  */
 export function playTickSound(): void {
   try {
     const ctx = getAudioContext();
     if (!ctx) return;
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
 
     const now = ctx.currentTime;
+    tickToggle = !tickToggle;
+
+    // Escapement primary frequency: 1800Hz on tick, 1420Hz on tock
+    const baseFreq = tickToggle ? 1800 : 1420;
+
+    // 1. Tonal click (sine oscillator)
     const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    const oscGain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(160, now + 0.024);
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1600, now);
-    osc.frequency.exponentialRampToValueAtTime(400, now + 0.015);
+    oscGain.gain.setValueAtTime(0.18, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.0005, now + 0.022);
 
-    gain.gain.setValueAtTime(0.08, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
+    osc.connect(oscGain);
+    oscGain.connect(ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.018);
+    osc.stop(now + 0.025);
+
+    // 2. High-frequency crisp gear click (micro impulse buffer)
+    const bufferSize = Math.floor(ctx.sampleRate * 0.008);
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+    }
+
+    const whiteNoise = ctx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.setValueAtTime(tickToggle ? 4200 : 3600, now);
+    noiseFilter.Q.setValueAtTime(3, now);
+
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.14, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+
+    whiteNoise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+
+    whiteNoise.start(now);
+    whiteNoise.stop(now + 0.015);
   } catch {
-    // Silent fallback
+    // Silent fallback if blocked
   }
 }
 

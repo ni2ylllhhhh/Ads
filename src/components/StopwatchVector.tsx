@@ -53,6 +53,10 @@ export const StopwatchVector: React.FC<StopwatchVectorProps> = ({
 
   const isGoGo = typeof value === 'string' && value.toLowerCase().includes('go');
 
+  // Mechanical clock needle rotation (0 to 360 degrees based on countdown)
+  const currentSec = typeof value === 'number' ? value : 0;
+  const needleAngle = isGoGo ? 360 : Math.max(0, Math.min(360, ((59 - currentSec) / 59) * 360));
+
   // Calculate sector arc path
   const clampedRatio = Math.max(0.001, Math.min(1.0, progress));
   const angleDeg = clampedRatio * 360;
@@ -117,6 +121,34 @@ export const StopwatchVector: React.FC<StopwatchVectorProps> = ({
             <stop offset="0%" stopColor="#FF7A00" />
             <stop offset="100%" stopColor="#B91C1C" />
           </linearGradient>
+
+          {/* Unique Chromatic Neon Gradient for Center Numbers (ইউনিক বহু রঙের গ্রেডিয়েন্ট) */}
+          <linearGradient id={`${gradientId}-uniqueNeonNumber`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFF000" />
+            <stop offset="22%" stopColor="#FF007A" />
+            <stop offset="48%" stopColor="#7928CA" />
+            <stop offset="76%" stopColor="#00E5FF" />
+            <stop offset="100%" stopColor="#00FF87" />
+          </linearGradient>
+
+          {/* Aurora Triumph Gradient for GO GO */}
+          <linearGradient id={`${gradientId}-goGoAuroraGrad`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00FF87" />
+            <stop offset="50%" stopColor="#00E5FF" />
+            <stop offset="100%" stopColor="#FFE600" />
+          </linearGradient>
+
+          {/* Clock Needle Gradient */}
+          <linearGradient id={`${gradientId}-needleGrad`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#FF5500" />
+            <stop offset="100%" stopColor="#DC2626" />
+          </linearGradient>
+
+          {/* Neon Drop Glow for Center Number */}
+          <filter id={`${gradientId}-numberNeonGlow`} x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#FF007A" floodOpacity="0.5" />
+            <feDropShadow dx="0" dy="0" stdDeviation="7" floodColor="#00E5FF" floodOpacity="0.4" />
+          </filter>
 
           {/* Dual-Tone Red & Blue Gradient for Center Numbers */}
           <linearGradient id={`${gradientId}-numberRedBlue`} x1="0%" y1="0%" x2="100%" y2="100%">
@@ -346,20 +378,73 @@ export const StopwatchVector: React.FC<StopwatchVectorProps> = ({
             />
           </g>
 
-          {/* Center Countdown Number or 'GO GO' in Radiant Dual Red-Blue Gradient */}
-          <text
-            x={cx}
-            y={isGoGo ? cy + 24 : cy + 39}
-            textAnchor="middle"
-            fontFamily="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
-            fontSize={isGoGo ? "72" : "126"}
-            fontWeight="900"
-            fill={`url(#${gradientId}-numberRedBlue)`}
-            letterSpacing={isGoGo ? "1" : "-4"}
-            className="select-none tracking-tighter uppercase"
+          {/* Mechanical Clock Needle (ঘড়ির কাঁটা) */}
+          <g
+            transform={`rotate(${needleAngle}, ${cx}, ${cy})`}
+            className="transition-transform duration-150 ease-out pointer-events-none"
           >
-            {value}
-          </text>
+            {/* Shadow of needle */}
+            <line
+              x1={cx}
+              y1={cy + 24}
+              x2={cx}
+              y2={cy - 142}
+              stroke="rgba(0,0,0,0.3)"
+              strokeWidth="4.5"
+              strokeLinecap="round"
+              transform="translate(2, 3)"
+            />
+            {/* Tail counterweight */}
+            <line
+              x1={cx}
+              y1={cy}
+              x2={cx}
+              y2={cy + 24}
+              stroke="#EA580C"
+              strokeWidth="4"
+              strokeLinecap="round"
+            />
+            <circle cx={cx} cy={cy + 24} r="5" fill="#DC2626" />
+
+            {/* Main needle shaft */}
+            <path
+              d={`M ${cx - 2.8} ${cy} L ${cx - 1.2} ${cy - 138} L ${cx} ${cy - 148} L ${cx + 1.2} ${cy - 138} L ${cx + 2.8} ${cy} Z`}
+              fill={`url(#${gradientId}-needleGrad)`}
+            />
+
+            {/* Glowing Pointer Tip Arrow */}
+            <circle
+              cx={cx}
+              cy={cy - 146}
+              r="4"
+              fill="#FFF000"
+              filter={`url(#${gradientId}-whiteglow)`}
+            />
+
+            {/* Center Pivot Hub Cap */}
+            <circle cx={cx} cy={cy} r="8.5" fill="#0F172A" stroke="#FF6B00" strokeWidth="2.5" />
+            <circle cx={cx} cy={cy} r="3" fill="#FFFFFF" />
+          </g>
+
+          {/* Center Countdown Number or 'GO GO' in Unique Multi-Color Gradient with Tick Animation */}
+          <g key={`num-anim-${value}`} className="animate-number-tick pointer-events-none">
+            <text
+              x={cx}
+              y={isGoGo ? cy + 24 : cy + 39}
+              textAnchor="middle"
+              fontFamily="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
+              fontSize={isGoGo ? "72" : "126"}
+              fontWeight="900"
+              fill={isGoGo ? `url(#${gradientId}-goGoAuroraGrad)` : `url(#${gradientId}-uniqueNeonNumber)`}
+              filter={`url(#${gradientId}-numberNeonGlow)`}
+              stroke="rgba(255, 255, 255, 0.4)"
+              strokeWidth="1.5"
+              letterSpacing={isGoGo ? "1" : "-4"}
+              className="select-none tracking-tighter uppercase drop-shadow-sm"
+            >
+              {value}
+            </text>
+          </g>
 
           {/* Subtle running indicator pip */}
           {isRunning && (
@@ -367,7 +452,7 @@ export const StopwatchVector: React.FC<StopwatchVectorProps> = ({
               cx={cx}
               cy={cy + 104}
               r="4.5"
-              fill="#FF6B00"
+              fill="#00E5FF"
               className="animate-ping"
             />
           )}
