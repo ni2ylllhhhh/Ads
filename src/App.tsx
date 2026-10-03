@@ -21,6 +21,7 @@ export default function App() {
   const scrollRafRef = useRef<number | null>(null);
   const scrollDirectionRef = useRef<1 | -1>(1); // 1 = down, -1 = up
   const isPausingAtEndRef = useRef<boolean>(false);
+  const isTabActiveRef = useRef<boolean>(true);
 
   // Toggle timer - restarts from 59 if finished
   const handleToggle = useCallback(() => {
@@ -68,12 +69,14 @@ export default function App() {
     };
   }, [TOTAL_SECONDS]);
 
-  // Pause timer & scrolling when user leaves tab/website, resume on return
+  // Pause timer when user leaves tab/website, resume on return
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
+        isTabActiveRef.current = false;
         setIsRunning(false);
       } else {
+        isTabActiveRef.current = true;
         if (!isFinished) {
           setIsRunning(true);
         }
@@ -81,10 +84,12 @@ export default function App() {
     };
 
     const handlePageHide = () => {
+      isTabActiveRef.current = false;
       setIsRunning(false);
     };
 
     const handlePageShow = () => {
+      isTabActiveRef.current = true;
       if (!isFinished) {
         setIsRunning(true);
       }
@@ -134,7 +139,7 @@ export default function App() {
   const progressRatio = typeof displayNumber === 'number' ? displayNumber / TOTAL_SECONDS : 0;
 
   // Auto-scroll loop: completes a one-way trip in ~11 seconds (more than 2 full round trips in 1 minute)
-  // Pauses when user is away from this website
+  // Continuous perpetual scrolling: NEVER STOPS, even after timer ends and 'go go' appears!
   useEffect(() => {
     let lastTime = performance.now();
 
@@ -142,8 +147,8 @@ export default function App() {
       const delta = Math.min(64, now - lastTime);
       lastTime = now;
 
-      // Only scroll when timer is actively running (user is on this website)
-      if (isRunning && !isPausingAtEndRef.current) {
+      // Scroll continuously whenever user is on this website (even after countdown finishes)
+      if (isTabActiveRef.current && !isPausingAtEndRef.current) {
         const currentY = window.scrollY;
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
 
@@ -188,7 +193,7 @@ export default function App() {
     return () => {
       if (scrollRafRef.current) cancelAnimationFrame(scrollRafRef.current);
     };
-  }, [isRunning, ONE_WAY_SCROLL_MS]);
+  }, [ONE_WAY_SCROLL_MS]);
 
   // Copy standalone HTML code
   const handleCopyCode = async () => {

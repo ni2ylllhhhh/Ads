@@ -523,12 +523,17 @@ export function generateStandaloneHtml(options: {
     // Start timer initially on refresh/load
     startTimer();
 
-    // Pause timer and scroll when user leaves website/tab, resume when returning
+    // Perpetual continuous scrolling state (never stops even after go go appears)
+    let isTabActive = true;
+
+    // Pause timer when user leaves website/tab, resume when returning
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
+        isTabActive = false;
         isRunning = false;
         stopTimer();
       } else {
+        isTabActive = true;
         if (remaining > 0) {
           isRunning = true;
           startTimer();
@@ -537,18 +542,20 @@ export function generateStandaloneHtml(options: {
     });
 
     window.addEventListener('pagehide', () => {
+      isTabActive = false;
       isRunning = false;
       stopTimer();
     });
 
     window.addEventListener('pageshow', () => {
+      isTabActive = true;
       if (remaining > 0) {
         isRunning = true;
         startTimer();
       }
     });
 
-    // Continuous Auto Scroll (Traverses in ~11s, completes > 2 full round trips per minute)
+    // Continuous Auto Scroll (Traverses in ~11s, completes > 2 full round trips per minute, never stops!)
     let scrollDirection = 1;
     let isPausing = false;
     let lastTime = performance.now();
@@ -557,8 +564,8 @@ export function generateStandaloneHtml(options: {
       const delta = Math.min(64, now - lastTime);
       lastTime = now;
 
-      // Only scroll when user is actively on this website
-      if (isRunning && !isPausing) {
+      // Scroll continuously on this page, even after 'go go' arrives!
+      if (isTabActive && !isPausing) {
         const currentY = window.scrollY;
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
 
