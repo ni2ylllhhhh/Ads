@@ -7,15 +7,24 @@ export interface AdConfig {
   name: string;
 }
 
-// 300x250 Ad Unit
-export const AD_300x250: AdConfig = {
+// 300x250 Ad Units (Alternating)
+export const AD_300x250_A: AdConfig = {
   key: '04735843ad84a3fe40af2adeae615bcc',
   width: 300,
   height: 250,
-  name: '300x250 Medium Rectangle',
+  name: '300x250 Medium Rectangle A',
 };
 
-// All ad units provided by the user:
+export const AD_300x250_B: AdConfig = {
+  key: '911ee250303f0d466e6e2cab58b077e0',
+  width: 300,
+  height: 250,
+  name: '300x250 Medium Rectangle B',
+};
+
+export const AD_300x250 = AD_300x250_A;
+
+// All ad units provided by the user (alternating 300x250 versions):
 export const USER_ADS: AdConfig[] = [
   {
     key: 'eaa4fef8b0f5d93fee9ae7712f89669a',
@@ -27,7 +36,7 @@ export const USER_ADS: AdConfig[] = [
     key: '04735843ad84a3fe40af2adeae615bcc',
     width: 300,
     height: 250,
-    name: '300x250 Medium Rectangle #1',
+    name: '300x250 Medium Rectangle #1 (A)',
   },
   {
     key: '9f8dfbea36991768186bae9257ff020f',
@@ -42,10 +51,10 @@ export const USER_ADS: AdConfig[] = [
     name: '160x300 Half Page Skyscraper',
   },
   {
-    key: '04735843ad84a3fe40af2adeae615bcc',
+    key: '911ee250303f0d466e6e2cab58b077e0',
     width: 300,
     height: 250,
-    name: '300x250 Medium Rectangle #2',
+    name: '300x250 Medium Rectangle #2 (B)',
   },
   {
     key: '1e697e3aca05db162956807313b69d9c',

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { StopwatchVector } from './components/StopwatchVector';
-import { AdBanner, AD_300x250 } from './components/AdBanner';
+import { AdBanner, AD_300x250_A, AD_300x250_B } from './components/AdBanner';
 import { generateStandaloneHtml } from './utils/htmlExport';
 import { playTickSound, playAlarmChime, playClickSound, initAudioOnInteraction } from './utils/audio';
 
@@ -284,14 +284,17 @@ export default function App() {
           ))}
         </div>
 
-        {/* 50 x 300x250 Medium Rectangle Ads in a responsive grid */}
+        {/* 50 x 300x250 Medium Rectangle Ads alternating one after another (একটা পরে পরে) */}
         <div className="w-full flex flex-col items-center">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl place-items-center">
-            {ads300x250.map((idx) => (
-              <div key={`rect-${idx}`} className="flex flex-col items-center">
-                <AdBanner index={idx} customAd={AD_300x250} />
-              </div>
-            ))}
+            {ads300x250.map((idx) => {
+              const currentAd = idx % 2 === 0 ? AD_300x250_A : AD_300x250_B;
+              return (
+                <div key={`rect-${idx}`} className="flex flex-col items-center">
+                  <AdBanner index={idx} customAd={currentAd} />
+                </div>
+              );
+            })}
           </div>
         </div>
       </main>

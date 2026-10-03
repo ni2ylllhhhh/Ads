@@ -181,10 +181,10 @@ export function generateStandaloneHtml(options: {
   // User Ad Units configurations (468x60, 300x250, 320x50, 160x300, 160x600)
   const USER_ADS = [
     { key: 'eaa4fef8b0f5d93fee9ae7712f89669a', width: 468, height: 60, name: '468x60 Banner' },
-    { key: '04735843ad84a3fe40af2adeae615bcc', width: 300, height: 250, name: '300x250 Medium Rectangle #1' },
+    { key: '04735843ad84a3fe40af2adeae615bcc', width: 300, height: 250, name: '300x250 Medium Rectangle #1 (A)' },
     { key: '9f8dfbea36991768186bae9257ff020f', width: 320, height: 50, name: '320x50 Mobile Leaderboard' },
     { key: 'f805ec9e8c8fed3fd38bf809a245bf29', width: 160, height: 300, name: '160x300 Half Page Skyscraper' },
-    { key: '04735843ad84a3fe40af2adeae615bcc', width: 300, height: 250, name: '300x250 Medium Rectangle #2' },
+    { key: '911ee250303f0d466e6e2cab58b077e0', width: 300, height: 250, name: '300x250 Medium Rectangle #2 (B)' },
     { key: '1e697e3aca05db162956807313b69d9c', width: 160, height: 600, name: '160x600 Wide Skyscraper' },
   ];
 
@@ -202,19 +202,21 @@ export function generateStandaloneHtml(options: {
     </div>
   `).join('\n');
 
-  // 50 Dedicated 300x250 ad slots
-  const rectSlots = Array.from({ length: 50 }, () => `
+  // 50 Dedicated 300x250 ad slots alternating between Banner A and Banner B (একটা পরে পরে)
+  const rectSlots = Array.from({ length: 50 }, (_, i) => {
+    const key = i % 2 === 0 ? '04735843ad84a3fe40af2adeae615bcc' : '911ee250303f0d466e6e2cab58b077e0';
+    return `
     <div class="ad-slot ad-300-250">
       <iframe
-        srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:300px;height:250px;overflow:hidden;}</style></head><body><script>atOptions={'key':'04735843ad84a3fe40af2adeae615bcc','format':'iframe','height':250,'width':300,'params':{}};</script><script src='https://glamourpicklessteward.com/04735843ad84a3fe40af2adeae615bcc/invoke.js'></script></body></html>"
+        srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:300px;height:250px;overflow:hidden;}</style></head><body><script>atOptions={'key':'${key}','format':'iframe','height':250,'width':300,'params':{}};</script><script src='https://glamourpicklessteward.com/${key}/invoke.js'></script></body></html>"
         width="300"
         height="250"
         frameborder="0"
         scrolling="no"
         sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
       ></iframe>
-    </div>
-  `).join('\n');
+    </div>`;
+  }).join('\n');
 
   return `<!DOCTYPE html>
 <html lang="bn">
