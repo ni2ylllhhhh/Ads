@@ -34,12 +34,10 @@ export const StopwatchVector: React.FC<StopwatchVectorProps> = ({
 }) => {
   const gradientId = useId();
 
-  // Center coordinates & radii
+  // Center coordinates & radius
   const cx = 250;
   const cy = 295;
   const rRing = 175;
-  const rOut = 167; // Outer edge of quadrant arc
-  const rIn = 118;  // Inner edge of quadrant arc
 
   // 12 ticks around the dial
   const ticks = Array.from({ length: 12 }, (_, i) => {
@@ -56,33 +54,6 @@ export const StopwatchVector: React.FC<StopwatchVectorProps> = ({
   // Mechanical clock needle rotation (0 to 360 degrees based on countdown)
   const currentSec = typeof value === 'number' ? value : 0;
   const needleAngle = isGoGo ? 360 : Math.max(0, Math.min(360, ((59 - currentSec) / 59) * 360));
-
-  // Calculate sector arc path
-  const clampedRatio = Math.max(0.001, Math.min(1.0, progress));
-  const angleDeg = clampedRatio * 360;
-  const angleRad = (angleDeg * Math.PI) / 180;
-  const largeArcFlag = angleDeg > 180 ? 1 : 0;
-
-  const startX_out = cx;
-  const startY_out = cy - rOut;
-  const endX_out = cx + Math.sin(angleRad) * rOut;
-  const endY_out = cy - Math.cos(angleRad) * rOut;
-
-  const endX_in = cx + Math.sin(angleRad) * rIn;
-  const endY_in = cy - Math.cos(angleRad) * rIn;
-  const startX_in = cx;
-  const startY_in = cy - rIn;
-
-  let sectorPath = '';
-  if (progress <= 0.005) {
-    sectorPath = '';
-  } else {
-    sectorPath = `M ${startX_out.toFixed(1)} ${startY_out.toFixed(1)}
-      A ${rOut} ${rOut} 0 ${largeArcFlag} 1 ${endX_out.toFixed(1)} ${endY_out.toFixed(1)}
-      L ${endX_in.toFixed(1)} ${endY_in.toFixed(1)}
-      A ${rIn} ${rIn} 0 ${largeArcFlag} 0 ${startX_in.toFixed(1)} ${startY_in.toFixed(1)}
-      Z`;
-  }
 
   return (
     <div className={`relative flex items-center justify-center select-none ${className}`}>
@@ -288,15 +259,6 @@ export const StopwatchVector: React.FC<StopwatchVectorProps> = ({
               />
             ))}
           </g>
-
-          {/* Dynamic Progress Arc with Radiant Orange to Red Gradient */}
-          {sectorPath && (
-            <path
-              d={sectorPath}
-              fill={`url(#${gradientId}-flame)`}
-              className="transition-all duration-200"
-            />
-          )}
 
           {/* 
             Deep Glow Lights behind Countdown Digits: Green, Black, Blue, and White (সবুজ কাল নীল সাদা গাঢ় বাতি)

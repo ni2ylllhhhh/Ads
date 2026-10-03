@@ -135,9 +135,6 @@ export default function App() {
     };
   }, [isRunning, isFinished]);
 
-  // Dynamic progress arc for the 59-second scale (0 to 59/59 = 1.0)
-  const progressRatio = typeof displayNumber === 'number' ? displayNumber / TOTAL_SECONDS : 0;
-
   // Auto-scroll loop: completes a one-way trip in ~11 seconds (more than 2 full round trips in 1 minute)
   // Continuous perpetual scrolling: NEVER STOPS, even after timer ends and 'go go' appears!
   useEffect(() => {
@@ -246,7 +243,6 @@ export default function App() {
         <div className="w-full max-w-[190px] sm:max-w-[210px] flex items-center justify-center pointer-events-auto">
           <StopwatchVector
             value={displayNumber}
-            progress={progressRatio}
             isRunning={isRunning}
             showNotches={false}
             onCrownClick={handleToggle}

@@ -34,26 +34,6 @@ export function generatePureSvg(options: {
     return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#1E293B" stroke-width="7" stroke-linecap="round" />`;
   }).join('\n      ');
 
-  const angleDeg = Math.min(360, Math.max(0.1, (progressPercent / 100) * 360));
-  const angleRad = (angleDeg * Math.PI) / 180;
-  const largeArcFlag = angleDeg > 180 ? 1 : 0;
-
-  const startX_out = cx;
-  const startY_out = cy - rOut;
-  const endX_out = cx + Math.sin(angleRad) * rOut;
-  const endY_out = cy - Math.cos(angleRad) * rOut;
-
-  const endX_in = cx + Math.sin(angleRad) * rIn;
-  const endY_in = cy - Math.cos(angleRad) * rIn;
-  const startX_in = cx;
-  const startY_in = cy - rIn;
-
-  const sectorPath = `M ${startX_out.toFixed(1)} ${startY_out.toFixed(1)}
-    A ${rOut} ${rOut} 0 ${largeArcFlag} 1 ${endX_out.toFixed(1)} ${endY_out.toFixed(1)}
-    L ${endX_in.toFixed(1)} ${endY_in.toFixed(1)}
-    A ${rIn} ${rIn} 0 ${largeArcFlag} 0 ${startX_in.toFixed(1)} ${startY_in.toFixed(1)}
-    Z`;
-
   const isGoGo = typeof value === 'string' && value.toLowerCase().includes('go');
   const currentSec = typeof value === 'number' ? value : (parseInt(String(value), 10) || 0);
   const needleAngle = isGoGo ? 360 : Math.max(0, Math.min(360, ((59 - currentSec) / 59) * 360));
@@ -154,9 +134,6 @@ export function generatePureSvg(options: {
   <g class="ticks">
       ${ticks}
   </g>
-
-  <!-- Progress Sector Arc (Orange to Red) -->
-  <path id="progress-arc" d="${sectorPath.trim()}" fill="url(#flameArc)" />
 
   <!-- Deep Green, Dark, Blue & White Lights behind number inside dial -->
   <g class="num-lights">
@@ -377,7 +354,6 @@ export function generateStandaloneHtml(options: {
     let timerId = null;
 
     const displayEl = document.getElementById('timer-display');
-    const arcEl = document.getElementById('progress-arc');
     const needleEl = document.getElementById('needle-group');
     const container = document.getElementById('timer-container');
 
@@ -457,22 +433,6 @@ export function generateStandaloneHtml(options: {
         const sec = typeof val === 'number' ? val : (parseInt(val, 10) || 0);
         const nAngle = isGo ? 360 : Math.max(0, Math.min(360, ((59 - sec) / 59) * 360));
         needleEl.setAttribute('transform', 'rotate(' + nAngle + ' 250 295)');
-      }
-      if (arcEl) {
-        const ratio = isGo ? 0 : (val / 59);
-        const cx = 250, cy = 295, rOut = 168, rIn = 120;
-        const angleDeg = Math.max(0.1, ratio * 360);
-        const angleRad = (angleDeg * Math.PI) / 180;
-        const endX_out = cx + Math.sin(angleRad) * rOut;
-        const endY_out = cy - Math.cos(angleRad) * rOut;
-        const endX_in = cx + Math.sin(angleRad) * rIn;
-        const endY_in = cy - Math.cos(angleRad) * rIn;
-        const path = 'M ' + cx + ' ' + (cy - rOut) +
-          ' A ' + rOut + ' ' + rOut + ' 0 0 1 ' + endX_out.toFixed(1) + ' ' + endY_out.toFixed(1) +
-          ' L ' + endX_in.toFixed(1) + ' ' + endY_in.toFixed(1) +
-          ' A ' + rIn + ' ' + rIn + ' 0 0 0 ' + cx + ' ' + (cy - rIn) +
-          ' Z';
-        arcEl.setAttribute('d', path);
       }
     }
 
