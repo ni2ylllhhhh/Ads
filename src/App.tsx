@@ -227,8 +227,8 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleToggle, handleReset]);
 
-  // 20 Ad items (alternating one after another)
-  const adCount = 20;
+  // 24 Ad items cycling through all user ad units
+  const adCount = 24;
   const ads = Array.from({ length: adCount }, (_, i) => i);
 
   return (
@@ -268,15 +268,14 @@ export default function App() {
       {/* 
         Main Scrolling Ads Stream:
         Positioned with padding-top to account for the lowered timer.
+        Displays all requested ad formats (468x60, 300x250, 320x50, 160x300, 160x600).
       */}
-      <main className="w-full max-w-4xl pt-80 sm:pt-88 pb-20 px-4 flex flex-col items-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl place-items-center">
-          {ads.map((idx) => (
-            <div key={idx} className="flex flex-col items-center">
-              <AdBanner index={idx} />
-            </div>
-          ))}
-        </div>
+      <main className="w-full max-w-2xl pt-80 sm:pt-88 pb-28 px-4 flex flex-col items-center gap-6">
+        {ads.map((idx) => (
+          <div key={idx} className="w-full flex justify-center items-center">
+            <AdBanner index={idx} />
+          </div>
+        ))}
       </main>
 
       {/* Copy notification toast */}

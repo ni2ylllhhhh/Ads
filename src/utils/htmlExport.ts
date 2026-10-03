@@ -178,15 +178,25 @@ export function generateStandaloneHtml(options: {
 
   const svgContent = generatePureSvg({ value: initialSeconds, progressPercent: (initialSeconds / 59) * 100, showNotches: false });
 
-  // Generate 20 alternating ad slots (even = key 1, odd = key 2)
-  const adSlots = Array.from({ length: 20 }, (_, i) => {
-    const key = i % 2 === 0 ? 'a3b363fb834c96728d56dc453a7ad4dd' : '9120e6932cff4b0757e097740b2e83a4';
+  // User Ad Units configurations (468x60, 300x250, 320x50, 160x300, 160x600)
+  const USER_ADS = [
+    { key: 'eaa4fef8b0f5d93fee9ae7712f89669a', width: 468, height: 60, name: '468x60 Banner' },
+    { key: '04735843ad84a3fe40af2adeae615bcc', width: 300, height: 250, name: '300x250 Medium Rectangle #1' },
+    { key: '9f8dfbea36991768186bae9257ff020f', width: 320, height: 50, name: '320x50 Mobile Leaderboard' },
+    { key: 'f805ec9e8c8fed3fd38bf809a245bf29', width: 160, height: 300, name: '160x300 Half Page Skyscraper' },
+    { key: '04735843ad84a3fe40af2adeae615bcc', width: 300, height: 250, name: '300x250 Medium Rectangle #2' },
+    { key: '1e697e3aca05db162956807313b69d9c', width: 160, height: 600, name: '160x600 Wide Skyscraper' },
+  ];
+
+  // Generate 24 ad slots cycling through all user ad units
+  const adSlots = Array.from({ length: 24 }, (_, i) => {
+    const ad = USER_ADS[i % USER_ADS.length];
     return `
-      <div class="ad-slot">
+      <div class="ad-slot" style="width: ${ad.width}px; height: ${ad.height}px;">
         <iframe
-          srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:300px;height:250px;overflow:hidden;}</style></head><body><script>atOptions={'key':'${key}','format':'iframe','height':250,'width':300,'params':{}};</script><script src='https://glamourpicklessteward.com/${key}/invoke.js'></script></body></html>"
-          width="300"
-          height="250"
+          srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:${ad.width}px;height:${ad.height}px;overflow:hidden;}</style></head><body><script>atOptions={'key':'${ad.key}','format':'iframe','height':${ad.height},'width':${ad.width},'params':{}};</script><script src='https://glamourpicklessteward.com/${ad.key}/invoke.js'></script></body></html>"
+          width="${ad.width}"
+          height="${ad.height}"
           frameborder="0"
           scrolling="no"
           sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
@@ -311,23 +321,24 @@ export function generateStandaloneHtml(options: {
       max-width: 680px;
       margin: 0 auto;
       padding-top: 340px;
-      padding-bottom: 80px;
+      padding-bottom: 90px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
+      flex-direction: column;
+      gap: 24px;
       justify-content: center;
       align-items: center;
+      width: 100%;
     }
     .ad-slot {
-      width: 300px;
-      height: 250px;
       background: #f8f8f8;
       border: 1px solid #e5e5e5;
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
+      max-width: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
   </style>
 </head>
