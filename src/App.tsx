@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { StopwatchVector } from './components/StopwatchVector';
-import { AdBanner } from './components/AdBanner';
+import { AdBanner, AD_300x250 } from './components/AdBanner';
 import { generateStandaloneHtml } from './utils/htmlExport';
 import { playTickSound, playAlarmChime, playClickSound, initAudioOnInteraction } from './utils/audio';
 
@@ -227,9 +227,13 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleToggle, handleReset]);
 
-  // 24 Ad items cycling through all user ad units
-  const adCount = 24;
-  const ads = Array.from({ length: adCount }, (_, i) => i);
+  // Multi-size banner units (468x60, 320x50, 160x300, 160x600, etc.)
+  const multiSizeCount = 6;
+  const multiSizeAds = Array.from({ length: multiSizeCount }, (_, i) => i);
+
+  // 50 Dedicated 300x250 Ads
+  const ad300x250Count = 50;
+  const ads300x250 = Array.from({ length: ad300x250Count }, (_, i) => i);
 
   return (
     <div className="min-h-screen w-full bg-white flex flex-col items-center selection:bg-neutral-900 selection:text-white select-none relative">
@@ -268,14 +272,28 @@ export default function App() {
       {/* 
         Main Scrolling Ads Stream:
         Positioned with padding-top to account for the lowered timer.
-        Displays all requested ad formats (468x60, 300x250, 320x50, 160x300, 160x600).
+        Includes all multi-size banners plus 50 units of 300x250 ads!
       */}
-      <main className="w-full max-w-2xl pt-80 sm:pt-88 pb-28 px-4 flex flex-col items-center gap-6">
-        {ads.map((idx) => (
-          <div key={idx} className="w-full flex justify-center items-center">
-            <AdBanner index={idx} />
+      <main className="w-full max-w-4xl pt-80 sm:pt-88 pb-28 px-4 flex flex-col items-center">
+        {/* Diverse Header Banners */}
+        <div className="w-full flex flex-col items-center gap-6 mb-8">
+          {multiSizeAds.map((idx) => (
+            <div key={`multi-${idx}`} className="w-full flex justify-center items-center">
+              <AdBanner index={idx} />
+            </div>
+          ))}
+        </div>
+
+        {/* 50 x 300x250 Medium Rectangle Ads in a responsive grid */}
+        <div className="w-full flex flex-col items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl place-items-center">
+            {ads300x250.map((idx) => (
+              <div key={`rect-${idx}`} className="flex flex-col items-center">
+                <AdBanner index={idx} customAd={AD_300x250} />
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </main>
 
       {/* Copy notification toast */}

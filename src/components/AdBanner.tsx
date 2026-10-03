@@ -7,6 +7,14 @@ export interface AdConfig {
   name: string;
 }
 
+// 300x250 Ad Unit
+export const AD_300x250: AdConfig = {
+  key: '04735843ad84a3fe40af2adeae615bcc',
+  width: 300,
+  height: 250,
+  name: '300x250 Medium Rectangle',
+};
+
 // All ad units provided by the user:
 export const USER_ADS: AdConfig[] = [
   {
@@ -49,14 +57,15 @@ export const USER_ADS: AdConfig[] = [
 
 interface AdBannerProps {
   index: number;
+  customAd?: AdConfig;
 }
 
-export const AdBanner: React.FC<AdBannerProps> = ({ index }) => {
+export const AdBanner: React.FC<AdBannerProps> = ({ index, customAd }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [hasError, setHasError] = useState(false);
 
-  // Cycle through all user ad configurations
-  const ad = USER_ADS[index % USER_ADS.length];
+  // Use customAd if passed; otherwise cycle through USER_ADS
+  const ad = customAd || USER_ADS[index % USER_ADS.length];
 
   const adHtml = `<!DOCTYPE html>
 <html>

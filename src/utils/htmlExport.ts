@@ -188,21 +188,33 @@ export function generateStandaloneHtml(options: {
     { key: '1e697e3aca05db162956807313b69d9c', width: 160, height: 600, name: '160x600 Wide Skyscraper' },
   ];
 
-  // Generate 24 ad slots cycling through all user ad units
-  const adSlots = Array.from({ length: 24 }, (_, i) => {
-    const ad = USER_ADS[i % USER_ADS.length];
-    return `
-      <div class="ad-slot" style="width: ${ad.width}px; height: ${ad.height}px;">
-        <iframe
-          srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:${ad.width}px;height:${ad.height}px;overflow:hidden;}</style></head><body><script>atOptions={'key':'${ad.key}','format':'iframe','height':${ad.height},'width':${ad.width},'params':{}};</script><script src='https://glamourpicklessteward.com/${ad.key}/invoke.js'></script></body></html>"
-          width="${ad.width}"
-          height="${ad.height}"
-          frameborder="0"
-          scrolling="no"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-        ></iframe>
-      </div>`;
-  }).join('\n');
+  // 6 Diverse multi-format ad slots
+  const multiSlots = USER_ADS.map((ad) => `
+    <div class="ad-slot" style="width: ${ad.width}px; height: ${ad.height}px;">
+      <iframe
+        srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:${ad.width}px;height:${ad.height}px;overflow:hidden;}</style></head><body><script>atOptions={'key':'${ad.key}','format':'iframe','height':${ad.height},'width':${ad.width},'params':{}};</script><script src='https://glamourpicklessteward.com/${ad.key}/invoke.js'></script></body></html>"
+        width="${ad.width}"
+        height="${ad.height}"
+        frameborder="0"
+        scrolling="no"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+      ></iframe>
+    </div>
+  `).join('\n');
+
+  // 50 Dedicated 300x250 ad slots
+  const rectSlots = Array.from({ length: 50 }, () => `
+    <div class="ad-slot ad-300-250">
+      <iframe
+        srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:300px;height:250px;overflow:hidden;}</style></head><body><script>atOptions={'key':'04735843ad84a3fe40af2adeae615bcc','format':'iframe','height':250,'width':300,'params':{}};</script><script src='https://glamourpicklessteward.com/04735843ad84a3fe40af2adeae615bcc/invoke.js'></script></body></html>"
+        width="300"
+        height="250"
+        frameborder="0"
+        scrolling="no"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+      ></iframe>
+    </div>
+  `).join('\n');
 
   return `<!DOCTYPE html>
 <html lang="bn">
@@ -324,7 +336,21 @@ export function generateStandaloneHtml(options: {
       padding-bottom: 90px;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    .multi-ads {
+      display: flex;
+      flex-direction: column;
       gap: 24px;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    .grid-300-250 {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
       justify-content: center;
       align-items: center;
       width: 100%;
@@ -340,6 +366,10 @@ export function generateStandaloneHtml(options: {
       max-width: 100%;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
+    .ad-300-250 {
+      width: 300px;
+      height: 250px;
+    }
   </style>
 </head>
 <body>
@@ -353,9 +383,14 @@ export function generateStandaloneHtml(options: {
     </div>
   </header>
 
-  <!-- 20 Alternating Ad Banners -->
+  <!-- Diverse Banners + 50 x 300x250 Ads -->
   <main class="ads-container">
-    ${adSlots}
+    <div class="multi-ads">
+      ${multiSlots}
+    </div>
+    <div class="grid-300-250">
+      ${rectSlots}
+    </div>
   </main>
 
   ${isInteractive ? `
