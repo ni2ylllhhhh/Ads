@@ -8,7 +8,7 @@ export interface AdConfig {
   scriptUrl?: string;
 }
 
-// 300x250 Ad Units (New Codes, Alternating)
+// 300x250 Ad Units
 export const AD_300x250_A: AdConfig = {
   key: '9120e6932cff4b0757e097740b2e83a4',
   width: 300,
@@ -25,9 +25,18 @@ export const AD_300x250_B: AdConfig = {
   scriptUrl: 'https://bauval.org/22/911ee250303f0d466e6e2cab58b077e0',
 };
 
+// Newly added 300x250 Ad Unit (bicea)
+export const AD_300x250_C: AdConfig = {
+  key: '04735843ad84a3fe40af2adeae615bcc',
+  width: 300,
+  height: 250,
+  name: '300x250 Medium Rectangle (bicea)',
+  scriptUrl: 'https://bicea.org/22/04735843ad84a3fe40af2adeae615bcc',
+};
+
 export const AD_300x250 = AD_300x250_A;
 
-// All ad units provided by the user (with new 300x250 ad units):
+// All ad units provided by the user (preserving all existing, with new bicea added):
 export const USER_ADS: AdConfig[] = [
   {
     key: 'eaa4fef8b0f5d93fee9ae7712f89669a',
@@ -66,6 +75,13 @@ export const USER_ADS: AdConfig[] = [
     width: 160,
     height: 600,
     name: '160x600 Wide Skyscraper',
+  },
+  {
+    key: '04735843ad84a3fe40af2adeae615bcc',
+    width: 300,
+    height: 250,
+    name: '300x250 Medium Rectangle #3 (bicea)',
+    scriptUrl: 'https://bicea.org/22/04735843ad84a3fe40af2adeae615bcc',
   },
 ];
 

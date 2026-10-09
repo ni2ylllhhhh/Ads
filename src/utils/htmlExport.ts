@@ -186,6 +186,7 @@ export function generateStandaloneHtml(options: {
     { key: 'f805ec9e8c8fed3fd38bf809a245bf29', width: 160, height: 300, name: '160x300 Half Page Skyscraper', scriptSrc: 'https://glamourpicklessteward.com/f805ec9e8c8fed3fd38bf809a245bf29/invoke.js' },
     { key: '911ee250303f0d466e6e2cab58b077e0', width: 300, height: 250, name: '300x250 Medium Rectangle #2 (bauval)', scriptSrc: 'https://bauval.org/22/911ee250303f0d466e6e2cab58b077e0' },
     { key: '1e697e3aca05db162956807313b69d9c', width: 160, height: 600, name: '160x600 Wide Skyscraper', scriptSrc: 'https://glamourpicklessteward.com/1e697e3aca05db162956807313b69d9c/invoke.js' },
+    { key: '04735843ad84a3fe40af2adeae615bcc', width: 300, height: 250, name: '300x250 Medium Rectangle #3 (bicea)', scriptSrc: 'https://bicea.org/22/04735843ad84a3fe40af2adeae615bcc' },
   ];
 
   // 6 Diverse multi-format ad slots
@@ -202,13 +203,21 @@ export function generateStandaloneHtml(options: {
     </div>
   `).join('\n');
 
-  // 50 Dedicated 300x250 ad slots alternating between brijmohan (A) and bauval (B) (একটা পরে পরে)
-  const rectSlots = Array.from({ length: 50 }, (_, i) => {
-    const isEven = i % 2 === 0;
-    const key = isEven ? '9120e6932cff4b0757e097740b2e83a4' : '911ee250303f0d466e6e2cab58b077e0';
-    const scriptSrc = isEven
-      ? 'https://brijmohan.org/22/9120e6932cff4b0757e097740b2e83a4'
-      : 'https://bauval.org/22/911ee250303f0d466e6e2cab58b077e0';
+  // 50 Dedicated 300x250 ad slots (alternating A & B) PLUS 10 new 300x250 ad slots (bicea) - Total 60 ads
+  const rectSlots = Array.from({ length: 60 }, (_, i) => {
+    let key = '';
+    let scriptSrc = '';
+    if (i < 50) {
+      const isEven = i % 2 === 0;
+      key = isEven ? '9120e6932cff4b0757e097740b2e83a4' : '911ee250303f0d466e6e2cab58b077e0';
+      scriptSrc = isEven
+        ? 'https://brijmohan.org/22/9120e6932cff4b0757e097740b2e83a4'
+        : 'https://bauval.org/22/911ee250303f0d466e6e2cab58b077e0';
+    } else {
+      // 10 new ads with bicea.org
+      key = '04735843ad84a3fe40af2adeae615bcc';
+      scriptSrc = 'https://bicea.org/22/04735843ad84a3fe40af2adeae615bcc';
+    }
     return `
     <div class="ad-slot ad-300-250">
       <iframe

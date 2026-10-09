@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { StopwatchVector } from './components/StopwatchVector';
-import { AdBanner, AD_300x250_A, AD_300x250_B } from './components/AdBanner';
+import { AdBanner, AD_300x250_A, AD_300x250_B, AD_300x250_C } from './components/AdBanner';
 import { generateStandaloneHtml } from './utils/htmlExport';
 import { playTickSound, playAlarmChime, playClickSound, initAudioOnInteraction } from './utils/audio';
 
@@ -231,9 +231,13 @@ export default function App() {
   const multiSizeCount = 6;
   const multiSizeAds = Array.from({ length: multiSizeCount }, (_, i) => i);
 
-  // 50 Dedicated 300x250 Ads
+  // 50 Dedicated 300x250 Ads (alternating A & B)
   const ad300x250Count = 50;
   const ads300x250 = Array.from({ length: ad300x250Count }, (_, i) => i);
+
+  // 10 Additional new 300x250 Ads (bicea.org) added without deleting anything
+  const newAdsCount = 10;
+  const newAds300x250 = Array.from({ length: newAdsCount }, (_, i) => i);
 
   return (
     <div className="min-h-screen w-full bg-white flex flex-col items-center selection:bg-neutral-900 selection:text-white select-none relative">
@@ -272,7 +276,7 @@ export default function App() {
       {/* 
         Main Scrolling Ads Stream:
         Positioned with padding-top to account for the lowered timer.
-        Includes all multi-size banners plus 50 units of 300x250 ads!
+        Includes all multi-size banners plus 50 existing + 10 new 300x250 ads!
       */}
       <main className="w-full max-w-4xl pt-80 sm:pt-88 pb-28 px-4 flex flex-col items-center">
         {/* Diverse Header Banners */}
@@ -284,7 +288,7 @@ export default function App() {
           ))}
         </div>
 
-        {/* 50 x 300x250 Medium Rectangle Ads alternating one after another (একটা পরে পরে) */}
+        {/* 50 x 300x250 Medium Rectangle Ads alternating (A & B) + 10 new 300x250 Ads (C - bicea) */}
         <div className="w-full flex flex-col items-center">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl place-items-center">
             {ads300x250.map((idx) => {
@@ -295,6 +299,11 @@ export default function App() {
                 </div>
               );
             })}
+            {newAds300x250.map((idx) => (
+              <div key={`new-rect-${idx}`} className="flex flex-col items-center">
+                <AdBanner index={50 + idx} customAd={AD_300x250_C} />
+              </div>
+            ))}
           </div>
         </div>
       </main>
