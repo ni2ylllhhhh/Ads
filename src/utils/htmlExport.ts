@@ -180,19 +180,19 @@ export function generateStandaloneHtml(options: {
 
   // User Ad Units configurations (468x60, 300x250, 320x50, 160x300, 160x600)
   const USER_ADS = [
-    { key: 'eaa4fef8b0f5d93fee9ae7712f89669a', width: 468, height: 60, name: '468x60 Banner' },
-    { key: '04735843ad84a3fe40af2adeae615bcc', width: 300, height: 250, name: '300x250 Medium Rectangle #1 (A)' },
-    { key: '9f8dfbea36991768186bae9257ff020f', width: 320, height: 50, name: '320x50 Mobile Leaderboard' },
-    { key: 'f805ec9e8c8fed3fd38bf809a245bf29', width: 160, height: 300, name: '160x300 Half Page Skyscraper' },
-    { key: '911ee250303f0d466e6e2cab58b077e0', width: 300, height: 250, name: '300x250 Medium Rectangle #2 (B)' },
-    { key: '1e697e3aca05db162956807313b69d9c', width: 160, height: 600, name: '160x600 Wide Skyscraper' },
+    { key: 'eaa4fef8b0f5d93fee9ae7712f89669a', width: 468, height: 60, name: '468x60 Banner', scriptSrc: 'https://glamourpicklessteward.com/eaa4fef8b0f5d93fee9ae7712f89669a/invoke.js' },
+    { key: '9120e6932cff4b0757e097740b2e83a4', width: 300, height: 250, name: '300x250 Medium Rectangle #1 (brijmohan)', scriptSrc: 'https://brijmohan.org/22/9120e6932cff4b0757e097740b2e83a4' },
+    { key: '9f8dfbea36991768186bae9257ff020f', width: 320, height: 50, name: '320x50 Mobile Leaderboard', scriptSrc: 'https://glamourpicklessteward.com/9f8dfbea36991768186bae9257ff020f/invoke.js' },
+    { key: 'f805ec9e8c8fed3fd38bf809a245bf29', width: 160, height: 300, name: '160x300 Half Page Skyscraper', scriptSrc: 'https://glamourpicklessteward.com/f805ec9e8c8fed3fd38bf809a245bf29/invoke.js' },
+    { key: '911ee250303f0d466e6e2cab58b077e0', width: 300, height: 250, name: '300x250 Medium Rectangle #2 (bauval)', scriptSrc: 'https://bauval.org/22/911ee250303f0d466e6e2cab58b077e0' },
+    { key: '1e697e3aca05db162956807313b69d9c', width: 160, height: 600, name: '160x600 Wide Skyscraper', scriptSrc: 'https://glamourpicklessteward.com/1e697e3aca05db162956807313b69d9c/invoke.js' },
   ];
 
   // 6 Diverse multi-format ad slots
   const multiSlots = USER_ADS.map((ad) => `
     <div class="ad-slot" style="width: ${ad.width}px; height: ${ad.height}px;">
       <iframe
-        srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:${ad.width}px;height:${ad.height}px;overflow:hidden;}</style></head><body><script>atOptions={'key':'${ad.key}','format':'iframe','height':${ad.height},'width':${ad.width},'params':{}};</script><script src='https://glamourpicklessteward.com/${ad.key}/invoke.js'></script></body></html>"
+        srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:${ad.width}px;height:${ad.height}px;overflow:hidden;}</style></head><body><script>atOptions={'key':'${ad.key}','format':'iframe','height':${ad.height},'width':${ad.width},'params':{}};</script><script src='${ad.scriptSrc}'></script></body></html>"
         width="${ad.width}"
         height="${ad.height}"
         frameborder="0"
@@ -202,13 +202,17 @@ export function generateStandaloneHtml(options: {
     </div>
   `).join('\n');
 
-  // 50 Dedicated 300x250 ad slots alternating between Banner A and Banner B (একটা পরে পরে)
+  // 50 Dedicated 300x250 ad slots alternating between brijmohan (A) and bauval (B) (একটা পরে পরে)
   const rectSlots = Array.from({ length: 50 }, (_, i) => {
-    const key = i % 2 === 0 ? '04735843ad84a3fe40af2adeae615bcc' : '911ee250303f0d466e6e2cab58b077e0';
+    const isEven = i % 2 === 0;
+    const key = isEven ? '9120e6932cff4b0757e097740b2e83a4' : '911ee250303f0d466e6e2cab58b077e0';
+    const scriptSrc = isEven
+      ? 'https://brijmohan.org/22/9120e6932cff4b0757e097740b2e83a4'
+      : 'https://bauval.org/22/911ee250303f0d466e6e2cab58b077e0';
     return `
     <div class="ad-slot ad-300-250">
       <iframe
-        srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:300px;height:250px;overflow:hidden;}</style></head><body><script>atOptions={'key':'${key}','format':'iframe','height':250,'width':300,'params':{}};</script><script src='https://glamourpicklessteward.com/${key}/invoke.js'></script></body></html>"
+        srcdoc="<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#fafafa;display:flex;align-items:center;justify-content:center;width:300px;height:250px;overflow:hidden;}</style></head><body><script>atOptions={'key':'${key}','format':'iframe','height':250,'width':300,'params':{}};</script><script src='${scriptSrc}'></script></body></html>"
         width="300"
         height="250"
         frameborder="0"

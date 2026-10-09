@@ -5,26 +5,29 @@ export interface AdConfig {
   width: number;
   height: number;
   name: string;
+  scriptUrl?: string;
 }
 
-// 300x250 Ad Units (Alternating)
+// 300x250 Ad Units (New Codes, Alternating)
 export const AD_300x250_A: AdConfig = {
-  key: '04735843ad84a3fe40af2adeae615bcc',
+  key: '9120e6932cff4b0757e097740b2e83a4',
   width: 300,
   height: 250,
-  name: '300x250 Medium Rectangle A',
+  name: '300x250 Medium Rectangle (brijmohan)',
+  scriptUrl: 'https://brijmohan.org/22/9120e6932cff4b0757e097740b2e83a4',
 };
 
 export const AD_300x250_B: AdConfig = {
   key: '911ee250303f0d466e6e2cab58b077e0',
   width: 300,
   height: 250,
-  name: '300x250 Medium Rectangle B',
+  name: '300x250 Medium Rectangle (bauval)',
+  scriptUrl: 'https://bauval.org/22/911ee250303f0d466e6e2cab58b077e0',
 };
 
 export const AD_300x250 = AD_300x250_A;
 
-// All ad units provided by the user (alternating 300x250 versions):
+// All ad units provided by the user (with new 300x250 ad units):
 export const USER_ADS: AdConfig[] = [
   {
     key: 'eaa4fef8b0f5d93fee9ae7712f89669a',
@@ -33,10 +36,11 @@ export const USER_ADS: AdConfig[] = [
     name: '468x60 Banner',
   },
   {
-    key: '04735843ad84a3fe40af2adeae615bcc',
+    key: '9120e6932cff4b0757e097740b2e83a4',
     width: 300,
     height: 250,
-    name: '300x250 Medium Rectangle #1 (A)',
+    name: '300x250 Medium Rectangle #1 (brijmohan)',
+    scriptUrl: 'https://brijmohan.org/22/9120e6932cff4b0757e097740b2e83a4',
   },
   {
     key: '9f8dfbea36991768186bae9257ff020f',
@@ -54,7 +58,8 @@ export const USER_ADS: AdConfig[] = [
     key: '911ee250303f0d466e6e2cab58b077e0',
     width: 300,
     height: 250,
-    name: '300x250 Medium Rectangle #2 (B)',
+    name: '300x250 Medium Rectangle #2 (bauval)',
+    scriptUrl: 'https://bauval.org/22/911ee250303f0d466e6e2cab58b077e0',
   },
   {
     key: '1e697e3aca05db162956807313b69d9c',
@@ -75,6 +80,7 @@ export const AdBanner: React.FC<AdBannerProps> = ({ index, customAd }) => {
 
   // Use customAd if passed; otherwise cycle through USER_ADS
   const ad = customAd || USER_ADS[index % USER_ADS.length];
+  const scriptSrc = ad.scriptUrl || `https://glamourpicklessteward.com/${ad.key}/invoke.js`;
 
   const adHtml = `<!DOCTYPE html>
 <html>
@@ -104,7 +110,7 @@ export const AdBanner: React.FC<AdBannerProps> = ({ index, customAd }) => {
       'params' : {}
     };
   </script>
-  <script type="text/javascript" src="https://glamourpicklessteward.com/${ad.key}/invoke.js"></script>
+  <script type="text/javascript" src="${scriptSrc}"></script>
 </body>
 </html>`;
 
